@@ -22,8 +22,8 @@ public class Application {
 	@Bean
 	CommandLineRunner runner(PostRepository postRepository) {
 		return args -> {
-			Post post = new Post(1L,"First Post", "This is the content of the first post.", "Alice", LocalDateTime.now(), LocalDateTime.now());
-			postRepository.createPost(post);
+			Post post = postRepository.getPostById(1).get();
+			System.out.println(post);
 		};
 	}
 

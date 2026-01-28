@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class PostRepository{
+public class PostRepository {
 
     private static final Logger log = LoggerFactory.getLogger(PostRepository.class);
     private final JdbcClient jdbcClient;
@@ -20,19 +20,21 @@ public class PostRepository{
         this.jdbcClient = jdbcClient;
     }
 
-
     public void createPost(Post post) {
-        var updated = jdbcClient.sql("INSERT INTO Post(id, title, created_at, updated_at, content, author) VALUES (?, ?, ?, ?, ?, ?)")
-                .params(List.of(post.id(), post.title(), post.createdAt(), post.updatedAt(), post.content(), post.author()))
+        var updated = jdbcClient
+                .sql("INSERT INTO Post(id, title, created_at, updated_at, content, author) VALUES (?, ?, ?, ?, ?, ?)")
+                .params(List.of(post.id(), post.title(), post.createdAt(), post.updatedAt(), post.content(),
+                        post.author()))
                 .update();
 
         Assert.state(updated == 1, "Failed to create post" + post.title());
     }
 
-
     public void updatePost(Post newPost, int id) {
-        var updated = jdbcClient.sql("UPDATE Post SET title = ?, created_at = ?, updated_at = ?, content = ?, author = ? WHERE id = ?")
-                .params(List.of(newPost.title(), newPost.createdAt(), newPost.updatedAt(), newPost.content(), newPost.author(), id))
+        var updated = jdbcClient
+                .sql("UPDATE Post SET title = ?, created_at = ?, updated_at = ?, content = ?, author = ? WHERE id = ?")
+                .params(List.of(newPost.title(), newPost.createdAt(), newPost.updatedAt(), newPost.content(),
+                        newPost.author(), id))
                 .update();
 
         Assert.state(updated == 1, "Failed to update post " + newPost.title());
@@ -45,16 +47,15 @@ public class PostRepository{
                 .optional();
     }
 
-
     public List<Post> getAllPost() {
         return jdbcClient.sql("SELECT * FROM Post")
                 .query(Post.class)
                 .list();
     }
 
-
     public Optional<Post> getPostByTitle(String title) {
-        return jdbcClient.sql("SELECT id, title, created_at, updated_at, content, author FROM Post WHERE title = :title")
+        return jdbcClient
+                .sql("SELECT id, title, created_at, updated_at, content, author FROM Post WHERE title = :title")
                 .param("title", title)
                 .query(Post.class)
                 .optional();
@@ -67,7 +68,6 @@ public class PostRepository{
                 .list();
     }
 
-
     public List<Post> getPostByDate(LocalDateTime date) {
         return jdbcClient.sql("SELECT * FROM Post WHERE created_at = :date")
                 .param("date", date)
@@ -75,11 +75,19 @@ public class PostRepository{
                 .list();
     }
 
-
     public Optional<Post> getPostByContent(String content) {
-        return jdbcClient.sql("SELECT id, title, created_at, updated_at, content, author FROM Post WHERE content = :content")
+        return jdbcClient
+                .sql("SELECT id, title, created_at, updated_at, content, author FROM Post WHERE content = :content")
                 .param("content", content)
                 .query(Post.class)
                 .optional();
+    }
+
+    public void deletePost(int id) {
+        var updated = jdbcClient.sql("DELETE FROM Post WHERE id = ?")
+                .param(id)
+                .update();
+
+        Assert.state(updated == 1, "Failed to delete post with id " + id);
     }
 }
